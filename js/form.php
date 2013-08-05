@@ -92,7 +92,7 @@ function runsearch()
                     url: "engine.php",
                     data: "action=table&start=" + $("#search_start").val() + "&stop=" + $("#search_stop").val() + "&mountpoints=" + $("#mounts_select").val().join(),
                     success: function(response) {
-                        $("#resp_table_list").html(response);
+                        $("#res_table").html(response);
                     }
                 });
 

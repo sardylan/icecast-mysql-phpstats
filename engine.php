@@ -34,6 +34,8 @@ $site_root = substr(getcwd(), 0, strlen($cwd) - strlen($page_path));
 
 require_once($site_root . "/includes/head.php");
 
+$sql_limit = "LIMIT 0, 30";
+
 // action=text&start=" + $("#search_start").val() + "&stop=" + $("#search_stop").val() + "&mountpoints=" + $("#mounts_select").val().join(),
 
 $action = my_get("action");
@@ -50,10 +52,9 @@ if($action == "text") {
     $ret["minonlinetime"] = "";
     $ret["aveonlinetime"] = "";
 
-    $sql_condition_time = "FROM stats WHERE stop > FROM_UNIXTIME({$engine_start}) AND start < FROM_UNIXTIME({$engine_stop}) AND duration > 30";
-    $sql_limit = "LIMIT 0, 30";
+    $sql_condition_time = "WHERE stop > FROM_UNIXTIME({$engine_start}) AND start < FROM_UNIXTIME({$engine_stop}) AND duration > 30";
 
-    $sql_query = "SELECT COUNT(id) AS listeners, MAX(duration) AS maxonlinetime, MIN(duration) AS minonlinetime {$sql_condition_time} ORDER BY duration DESC {$sql_limit}";
+    $sql_query = "SELECT COUNT(id) AS listeners, MAX(duration) AS maxonlinetime, MIN(duration) AS minonlinetime FROM stats {$sql_condition_time} ORDER BY duration DESC {$sql_limit}";
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
@@ -63,7 +64,7 @@ if($action == "text") {
                 $ret["minonlinetime"] = strftime("%H:%M:%S", (int) ($sql_data["minonlinetime"]));
             }
 
-    $sql_query = "SELECT COUNT(id) AS listeners, SUM(duration) AS sum {$sql_condition_time}";
+    $sql_query = "SELECT COUNT(id) AS listeners, SUM(duration) AS sum FROM stats {$sql_condition_time}";
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
@@ -74,6 +75,48 @@ if($action == "text") {
     header("Cache-Control: no-cache, must-revalidate");
 
     echo json_encode($ret);
+}
+
+if($action == "mountpoints") {
+    $ret = "";
+
+    $sql_condition_time = "WHERE tta.stop > FROM_UNIXTIME({$engine_start}) AND tta.start < FROM_UNIXTIME({$engine_stop}) AND tta.duration > 30";
+    $sql_limit = "LIMIT 0, 30";
+
+    $sql_query = "SELECT COUNT(tta.id) AS listeners, ttb.mount AS mount FROM stats tta, mountpoints ttb {$sql_condition_time} AND tta.mount = ttb.id GROUP BY mount";
+
+    error_log($sql_query);
+
+    if($sql_result = $sql_conn->query($sql_query))
+        if($sql_result->num_rows > 0)
+            while($sql_data = $sql_result->fetch_array(MYSQLI_ASSOC))
+                $ret .= "<li>{$sql_data["mount"]} ({$sql_data["listeners"]})</li>";
+
+    header("Content-type: text/html");
+    header("Cache-Control: no-cache, must-revalidate");
+
+    echo $ret;
+}
+
+if($action == "table") {
+    $ret = "";
+
+    $sql_condition_time = "WHERE tta.stop > FROM_UNIXTIME({$engine_start}) AND tta.start < FROM_UNIXTIME({$engine_stop}) AND tta.duration > 30";
+    $sql_limit = "LIMIT 0, 30";
+
+    $sql_query = "SELECT tta.ip AS ip, tta.agent AS agent, ttb.mount AS mount, tta.start AS start, tta.stop AS stop, tta.duration AS duration FROM stats tta, mountpoints ttb {$sql_condition_time} AND tta.mount = ttb.id ORDER BY duration DESC {$sql_limit}";
+
+    error_log($sql_query);
+
+    if($sql_result = $sql_conn->query($sql_query))
+        if($sql_result->num_rows > 0)
+            while($sql_data = $sql_result->fetch_array(MYSQLI_ASSOC))
+                $ret .= "<tr><td>{$sql_data["ip"]}</td><td>{$sql_data["mount"]}</td><td>" . parseUserAgent($sql_data["agent"]) . "</td><td>{$sql_data["start"]}<br />{$sql_data["stop"]}</td><td>{$sql_data["duration"]}</td></tr>";
+
+    header("Content-type: text/html");
+    header("Cache-Control: no-cache, must-revalidate");
+
+    echo $ret;
 }
 
 ?>

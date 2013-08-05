@@ -28,6 +28,8 @@
  */
 
 
+date_default_timezone_set("Europe/Rome");
+
 require_once($site_root . "/includes/functions.php");
 
 define("MYSQL_CONN_ADDR", "localhost");

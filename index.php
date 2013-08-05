@@ -106,7 +106,21 @@ require_once($site_root . "/includes/head.php");
                     <div id="summary-image"><img id="img_listeners" src="img/loading.png" alt="Listeners" title="Listeners" /></div>
                 </div>
                 <div class="spacer"></div>
-                <div id="resp_table_list"></div>
+                <div id="table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>IP</th>
+                                <th>MOUNT</th>
+                                <th>AGENT</th>
+                                <th>START<br />
+                                    STOP</th>
+                                <th>DURATION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="res_table"></tbody>
+                    </table>
+                </div>
             </div>
             <div id="bigspacer"></div>
         </div>

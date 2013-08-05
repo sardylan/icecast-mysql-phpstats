@@ -155,9 +155,8 @@ function parseUserAgent($input = "")
 {
     $ret = "";
 
-    if(strlen($input) > 0) {
-        $ret = $input;
-    }
+    if(strlen($input) > 0)
+        $ret = urldecode(html_entity_decode($input));
 
     return $ret;
 }
