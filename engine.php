@@ -63,8 +63,8 @@ if($action == "text") {
         if($sql_result->num_rows > 0)
             if($sql_data = $sql_result->fetch_array(MYSQLI_ASSOC)) {
                 $ret["listeners"] = $sql_data["listeners"];
-                $ret["maxonlinetime"] = strftime("%H:%M:%S", (int) ($sql_data["maxonlinetime"]));
-                $ret["minonlinetime"] = strftime("%H:%M:%S", (int) ($sql_data["minonlinetime"]));
+                $ret["maxonlinetime"] = date("H:i:s", (int) ($sql_data["maxonlinetime"]) - 3600);
+                $ret["minonlinetime"] = date("H:i:s", (int) ($sql_data["minonlinetime"]) - 3600);
             }
 
     $sql_query = "SELECT COUNT(id) AS listeners, SUM(duration) AS sum FROM stats {$sql_condition_time} {$sql_blacklist}";
@@ -72,7 +72,7 @@ if($action == "text") {
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
             if($sql_data = $sql_result->fetch_array(MYSQLI_ASSOC))
-                $ret["aveonlinetime"] = strftime("%H:%M:%S", (int) ($sql_data["sum"] / $sql_data["listeners"]));
+                $ret["aveonlinetime"] = date("H:i:s", (int) ($sql_data["sum"] / $sql_data["listeners"]) - 3600);
 
     header("Content-type: application/json");
     header("Cache-Control: no-cache, must-revalidate");
@@ -133,7 +133,7 @@ if($action == "table") {
                 $ret .= "<td class=\"res_table_agent\">{$user_agent_parsed}</td>";
 
                 $ret .= "<td class=\"res_table_startstop\">{$sql_data["start"]}<br />{$sql_data["stop"]}</td>";
-                $ret .= "<td class=\"res_table_duration\">" . strftime("%H:%I:%S", $sql_data["duration"]) . "</td>";
+                $ret .= "<td class=\"res_table_duration\">" . date("H:i:s", $sql_data["duration"] - 3600) . "</td>";
                 $ret .= "</tr>";
             }
 
