@@ -150,17 +150,6 @@ function printVar($input) {
     printf("</pre>\n");
 }
 
-
-function parseUserAgent($input = "")
-{
-    $ret = "";
-
-    if(strlen($input) > 0)
-        $ret = urldecode(html_entity_decode($input));
-
-    return $ret;
-}
-
 function splitDateTime($input = "")
 {
     $ret = "";
@@ -172,4 +161,13 @@ function splitDateTime($input = "")
 
     return $ret;
 }
+
+function strStart($input, $start)
+{
+    if(substr($input, 0, strlen($start)) == $start)
+        return true;
+    else
+        return false;
+}
+
 ?>

@@ -33,6 +33,7 @@ $cwd = getcwd();
 $site_root = substr(getcwd(), 0, strlen($cwd) - strlen($page_path));
 
 require_once($site_root . "/includes/head.php");
+require_once($site_root . "/includes/useragent.php");
 
 $sql_limit = "LIMIT 0, 30";
 
@@ -42,6 +43,7 @@ $action = my_get("action");
 
 $engine_start = strtotime(my_get("start") . ":00");
 $engine_stop = strtotime(my_get("stop") . ":59");
+
 
 if($action == "text") {
     $ret["start"] = strftime("%Y-%m-%d %H:%I:%S", $engine_start);
@@ -53,8 +55,9 @@ if($action == "text") {
     $ret["aveonlinetime"] = "";
 
     $sql_condition_time = "WHERE stop > FROM_UNIXTIME({$engine_start}) AND start < FROM_UNIXTIME({$engine_stop}) AND duration > 30";
+    $sql_blacklist = "AND ip NOT IN (SELECT ip FROM ipblacklist)";
 
-    $sql_query = "SELECT COUNT(id) AS listeners, MAX(duration) AS maxonlinetime, MIN(duration) AS minonlinetime FROM stats {$sql_condition_time} ORDER BY duration DESC {$sql_limit}";
+    $sql_query = "SELECT COUNT(id) AS listeners, MAX(duration) AS maxonlinetime, MIN(duration) AS minonlinetime FROM stats {$sql_condition_time} {$sql_blacklist} ORDER BY duration DESC {$sql_limit}";
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
@@ -64,7 +67,7 @@ if($action == "text") {
                 $ret["minonlinetime"] = strftime("%H:%M:%S", (int) ($sql_data["minonlinetime"]));
             }
 
-    $sql_query = "SELECT COUNT(id) AS listeners, SUM(duration) AS sum FROM stats {$sql_condition_time}";
+    $sql_query = "SELECT COUNT(id) AS listeners, SUM(duration) AS sum FROM stats {$sql_condition_time} {$sql_blacklist}";
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
@@ -81,9 +84,10 @@ if($action == "mountpoints") {
     $ret = "";
 
     $sql_condition_time = "WHERE tta.stop > FROM_UNIXTIME({$engine_start}) AND tta.start < FROM_UNIXTIME({$engine_stop}) AND tta.duration > 30";
+    $sql_blacklist = "AND tta.ip NOT IN (SELECT ip FROM ipblacklist)";
     $sql_limit = "LIMIT 0, 30";
 
-    $sql_query = "SELECT COUNT(tta.id) AS listeners, ttb.mount AS mount FROM stats tta, mountpoints ttb {$sql_condition_time} AND tta.mount = ttb.id GROUP BY mount";
+    $sql_query = "SELECT COUNT(tta.id) AS listeners, ttb.mount AS mount FROM stats tta, mountpoints ttb {$sql_condition_time} {$sql_blacklist} AND tta.mount = ttb.id GROUP BY mount";
 
     error_log($sql_query);
 
@@ -102,16 +106,36 @@ if($action == "table") {
     $ret = "";
 
     $sql_condition_time = "WHERE tta.stop > FROM_UNIXTIME({$engine_start}) AND tta.start < FROM_UNIXTIME({$engine_stop}) AND tta.duration > 30";
-    $sql_limit = "LIMIT 0, 30";
+    $sql_blacklist = "AND tta.ip NOT IN (SELECT ip FROM ipblacklist)";
+    $sql_limit = "";
 
-    $sql_query = "SELECT tta.ip AS ip, tta.agent AS agent, ttb.mount AS mount, tta.start AS start, tta.stop AS stop, tta.duration AS duration FROM stats tta, mountpoints ttb {$sql_condition_time} AND tta.mount = ttb.id ORDER BY duration DESC {$sql_limit}";
+    $sql_order = "ORDER BY duration DESC";
+
+    $sql_query = "SELECT tta.ip AS ip, tta.agent AS agent, ttb.mount AS mount, tta.start AS start, tta.stop AS stop, tta.duration AS duration FROM stats tta, mountpoints ttb {$sql_condition_time} {$sql_blacklist} AND tta.mount = ttb.id {$sql_order} {$sql_limit}";
 
     error_log($sql_query);
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
-            while($sql_data = $sql_result->fetch_array(MYSQLI_ASSOC))
-                $ret .= "<tr><td>{$sql_data["ip"]}</td><td>{$sql_data["mount"]}</td><td>" . parseUserAgent($sql_data["agent"]) . "</td><td>{$sql_data["start"]}<br />{$sql_data["stop"]}</td><td>{$sql_data["duration"]}</td></tr>";
+            while($sql_data = $sql_result->fetch_array(MYSQLI_ASSOC)) {
+                $user_agent = cleanUserAgent($sql_data["agent"]);
+                $user_agent_parsed = parseUserAgent($user_agent);
+
+                $ret .= "<tr>";
+                $ret .= "<td class=\"res_table_ip\"><a href=\"http://www.geoiptool.com/?IP={$sql_data["ip"]}\">{$sql_data["ip"]}</a></td>";
+                $ret .= "<td class=\"res_table_mount\">{$sql_data["mount"]}</td>";
+
+//                 if($user_agent_parsed == $user_agent)
+//                     $ret .= "<td class=\"res_table_agent\">{$user_agent}</td>";
+//                 else
+//                     $ret .= "<td class=\"res_table_agent\">{$user_agent_parsed}<br /><span class=\"small_agent\">{$user_agent}</span></td>";
+
+                $ret .= "<td class=\"res_table_agent\">{$user_agent_parsed}</td>";
+
+                $ret .= "<td class=\"res_table_startstop\">{$sql_data["start"]}<br />{$sql_data["stop"]}</td>";
+                $ret .= "<td class=\"res_table_duration\">" . strftime("%H:%I:%S", $sql_data["duration"]) . "</td>";
+                $ret .= "</tr>";
+            }
 
     header("Content-type: text/html");
     header("Cache-Control: no-cache, must-revalidate");

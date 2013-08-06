@@ -55,8 +55,47 @@ div#table table {
     width: 100%;
 }
 
-tbody#res_table td {
+thead.res_table th {
+    border-style: solid;
+    border-width: 2px;
+    border-color: rgb(0, 0, 0);
+}
+
+tbody.res_table td {
     border-style: solid;
     border-width: 1px;
     border-color: rgb(0, 0, 0);
+}
+
+td.res_table_ip {
+    width: 150px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+td.res_table_mount {
+    width: 250px;
+}
+
+td.res_table_agent {
+}
+
+td.res_table_startstop {
+    width: 180px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+td.res_table_duration {
+    width: 100px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+span.small_agent {
+    font-size: 9px;
 }

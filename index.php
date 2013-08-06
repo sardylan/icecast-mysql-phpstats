@@ -108,17 +108,17 @@ require_once($site_root . "/includes/head.php");
                 <div class="spacer"></div>
                 <div id="table">
                     <table>
-                        <thead>
+                        <thead class="res_table">
                             <tr>
-                                <th>IP</th>
-                                <th>MOUNT</th>
-                                <th>AGENT</th>
-                                <th>START<br />
+                                <th class="res_table_ip">IP</th>
+                                <th class="res_table_mount">MOUNT</th>
+                                <th class="res_table_agent">AGENT</th>
+                                <th class="res_table_startstop">START<br />
                                     STOP</th>
-                                <th>DURATION</th>
+                                <th class="res_table_duration">DURATION</th>
                             </tr>
                         </thead>
-                        <tbody id="res_table"></tbody>
+                        <tbody id="res_table" class="res_table"></tbody>
                     </table>
                 </div>
             </div>
