@@ -93,9 +93,9 @@ function runsearch()
                     data: "action=table&start=" + $("#search_start").val() + "&stop=" + $("#search_stop").val() + "&mountpoints=" + $("#mounts_select").val().join(),
                     success: function(response) {
                         $("#res_table").html(response);
+                        setTimeout(obtainHostNames(), 1500);
                     }
                 });
-
             }
         });
     } else {

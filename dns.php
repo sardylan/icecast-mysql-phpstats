@@ -1,3 +1,5 @@
+<?php
+
 /*
  * PHP Site for Icecast MySQL Stats
  * Copyright (C) 2013  Luca Cireddu
@@ -26,78 +28,21 @@
  */
 
 
-@charset "UTF-8";
+$page_path = "";
+$cwd = getcwd();
+$site_root = substr(getcwd(), 0, strlen($cwd) - strlen($page_path));
 
-div#content {
-    min-height: 150px;
+require_once($site_root . "/includes/head.php");
+
+header("Content-type: text/plain");
+header("Cache-Control: no-cache, must-revalidate");
+
+$ip = my_get("ip");
+
+if(strlen($ip) > 0 && filter_var($ip, FILTER_VALIDATE_IP)) {
+    $hostname = gethostbyaddr($ip);
+    if($hostname != $ip)
+        echo $hostname;
 }
 
-div#summary div {
-    min-height: 100px;
-}
-
-div#summary-text {
-    float: left;
-}
-
-div#summary-image {
-    float: right;
-    width: 400px;
-    text-align: center;
-    background-color: rgb(128,255,128);
-}
-
-div#table {
-    width: 100%;
-}
-
-div#table table {
-    width: 100%;
-}
-
-thead.res_table th {
-    border-style: solid;
-    border-width: 2px;
-    border-color: rgb(0, 0, 0);
-}
-
-tbody.res_table td {
-    border-style: solid;
-    border-width: 1px;
-    border-color: rgb(0, 0, 0);
-    height: 40px;
-}
-
-td.res_table_ip {
-    width: 350px;
-    text-align: center;
-    font-family: monospace;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-td.res_table_mount {
-    width: 250px;
-}
-
-td.res_table_agent {
-    font-size: 10px;
-}
-
-td.res_table_startstop {
-    width: 180px;
-    text-align: center;
-    font-family: monospace;
-    font-size: 14px;
-}
-
-td.res_table_duration {
-    width: 100px;
-    text-align: center;
-    font-family: monospace;
-    font-size: 14px;
-}
-
-span.small_agent {
-    font-size: 9px;
-}
+?>

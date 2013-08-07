@@ -30,37 +30,21 @@
  */
 
 
-// define("OUTPUT_WINDOWS", " Windows");
-// define("OUTPUT_MAC", " Mac");
-// define("OUTPUT_LINUX", " Linux");
-define("OUTPUT_IOS", "iOS");
-// define("OUTPUT_ANDROID", "Android");
-
-// define("OUTPUT_FIREFOX", "Firefox");
-// define("OUTPUT_GOOGLECHROME", "Google Chrome");
-// define("OUTPUT_SAFARI", "Safari");
-define("OUTPUT_OPERA", "Opera");
-// define("OUTPUT_IE", "Internet Explorer");
-
-// define("OUTPUT_ICECAST", "Icecast");
-
-// define("OUTPUT_ITUNES", "iTunes");
-// define("OUTPUT_WMP", "Windows Media Player");
-// define("OUTPUT_VLC", "VLC");
-// define("OUTPUT_WINAMP", "Winamp");
-
-
 define("OUTPUT_WINDOWS", "<img src=\"img/icons/windows.png\" alt=\"Windows\" title=\"Windows\" />");
 define("OUTPUT_MAC", "<img src=\"img/icons/mac.png\" alt=\"Mac\" title=\"Mac\" />");
 define("OUTPUT_LINUX", "<img src=\"img/icons/linux.png\" alt=\"Linux\" title=\"Linux\" />");
-// define("OUTPUT_IOS", "iOS");
+define("OUTPUT_IOS", "<img src=\"img/icons/ios.png\" alt=\"iOS\" title=\"iOS\" />");
 define("OUTPUT_ANDROID", "<img src=\"img/icons/android.png\" alt=\"Android\" title=\"Android\" />");
 
 define("OUTPUT_FIREFOX", "<img src=\"img/icons/firefox.png\" alt=\"Firefox\" title=\"Firefox\" />");
 define("OUTPUT_GOOGLECHROME", "<img src=\"img/icons/googlechrome.png\" alt=\"Google Chrome\" title=\"Google Chorme\" />");
 define("OUTPUT_SAFARI", "<img src=\"img/icons/safari.png\" alt=\"Safari\" title=\"Safari\" />");
-// define("OUTPUT_OPERA", "Opera");
-define("OUTPUT_IE", "<img src=\"img/icons/ie.png\" alt=\"Internet Explorer\" title=\"Internet Explorer\" />");
+define("OUTPUT_OPERA", "<img src=\"img/icons/opera.png\" alt=\"Opera\" title=\"Opera\" />");
+define("OUTPUT_IE6", "<img src=\"img/icons/ie6.png\" alt=\"Internet Explorer 6\" title=\"Internet Explorer 6\" />");
+define("OUTPUT_IE7", "<img src=\"img/icons/ie7.png\" alt=\"Internet Explorer 7\" title=\"Internet Explorer 7\" />");
+define("OUTPUT_IE8", "<img src=\"img/icons/ie8.png\" alt=\"Internet Explorer 8\" title=\"Internet Explorer 8\" />");
+define("OUTPUT_IE9", "<img src=\"img/icons/ie9.png\" alt=\"Internet Explorer 9\" title=\"Internet Explorer 9\" />");
+define("OUTPUT_IE10", "<img src=\"img/icons/ie10.png\" alt=\"Internet Explorer 10\" title=\"Internet Explorer 10\" />");
 
 define("OUTPUT_ICECAST", "<img src=\"img/icons/icecast.png\" alt=\"Icecast\" title=\"Icecast\" />");
 
@@ -69,6 +53,10 @@ define("OUTPUT_WMP", "<img src=\"img/icons/wmp.png\" alt=\"Windows Media Player\
 define("OUTPUT_VLC", "<img src=\"img/icons/vlc.png\" alt=\"VLC\" title=\"VLC\" />");
 define("OUTPUT_WINAMP", "<img src=\"img/icons/winamp.png\" alt=\"Winamp\" title=\"Winamp\" />");
 
+define("OUTPUT_SAMSUNGSMARTTV", "<img src=\"img/icons/samsungsmarttv.png\" alt=\"Samsung Smart TV\" title=\"Samsung Smart TV\" />");
+define("OUTPUT_TUNEIN", "<img src=\"img/icons/tunein.png\" alt=\"TuneIn\" title=\"TuneIn\" />");
+
+define("OUTPUT_BOT", "<img src=\"img/icons/bot.png\" alt=\"Search Engine Bot\" title=\"Search Engine Bot\" />");
 
 function cleanUserAgent($input = "")
 {
@@ -83,9 +71,13 @@ function parseUserAgent($input = "")
         $ret = $input;
 
         if($input == "Lavf52.111.0") {
-            $ret = "TuneIn (not sure)";
+            $ret = OUTPUT_TUNEIN;
         } else if($input == "RMA/1.0 (compatible; RealMedia)") {
-            $ret = "Radio";
+            $ret = "WiFi Radio <strong>(not sure)</strong>";
+        } else if(preg_match("/bot/i", $input)) {
+            $ret = OUTPUT_BOT;
+        } else if(preg_match("/SMART-TV/i", $input)) {
+            $ret = OUTPUT_SAMSUNGSMARTTV;
         } else if(preg_match("/^iTunes/i", $input)) {
             $ret = OUTPUT_ITUNES;
             if(preg_match("/Mac/i", $input)) {
@@ -114,17 +106,16 @@ function parseUserAgent($input = "")
                 $ret .= OUTPUT_LINUX;
             }
         } else if(preg_match("/msie/i", $input)) {
-            $ret = OUTPUT_IE;
             if(preg_match("/msie 6/i", $input)) {
-                $ret .= " 6";
+                $ret = OUTPUT_IE6;
             } else if(preg_match("/msie 7/i", $input)) {
-                $ret .= " 7";
+                $ret = OUTPUT_IE7;
             } else if(preg_match("/msie 8/i", $input)) {
-                $ret .= " 8";
+                $ret = OUTPUT_IE8;
             } else if(preg_match("/msie 9/i", $input)) {
-                $ret .= " 9";
+                $ret = OUTPUT_IE9;
             } else if(preg_match("/msie 10/i", $input)) {
-                $ret .= " 10";
+                $ret = OUTPUT_IE10;
             }
         } else if(preg_match("/safari/i", $input)) {
             $ret = OUTPUT_SAFARI;
@@ -156,21 +147,8 @@ function parseUserAgent($input = "")
                     $ret .= " ARM";
                 }
             }
-        } else if(preg_match("/^RadioAlarm/i", $input)) {
-            $ret = "Radio Alarm App";
-            if(preg_match("/CFNetwork/i", $input)) {
-                $ret .= OUTPUT_IOS;
-            }
-        } else if(preg_match("/^RadioAlarmhd/i", $input)) {
-            $ret = "Radio Alarm HD App";
-            if(preg_match("/CFNetwork/i", $input)) {
-                $ret .= OUTPUT_IOS;
-            }
-        } else if(preg_match("/^Italy/i", $input)) {
-            $ret = "Radio Italy App";
-            if(preg_match("/CFNetwork/i", $input)) {
-                $ret .= OUTPUT_IOS;
-            }
+        } else if(preg_match("/CFNetwork/i", $input)) {
+            $ret = OUTPUT_IOS;
         } else if(preg_match("/^icecast/i", $input)) {
             $ret = OUTPUT_ICECAST;
         } else if(preg_match("/wowza/i", $input)) {

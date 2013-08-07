@@ -26,78 +26,28 @@
  */
 
 
-@charset "UTF-8";
-
-div#content {
-    min-height: 150px;
+function updateHostnameSpan(text, obj)
+{
+    if(text.length > 0)
+        obj.html(text);
 }
 
-div#summary div {
-    min-height: 100px;
-}
+function obtainHostNames() {
+    $("#res_table .res_table_ip > a").each(function(){
 
-div#summary-text {
-    float: left;
-}
+        obj = $(this).parent().children("span");
+        ip = this.innerText;
 
-div#summary-image {
-    float: right;
-    width: 400px;
-    text-align: center;
-    background-color: rgb(128,255,128);
-}
+        $.ajax({
+            context: obj,
+            type: "GET",
+            url: "dns.php",
+            data: "ip=" + ip,
+            success: function(response) {
+                updateHostnameSpan(response, this);
+            }
+        });
 
-div#table {
-    width: 100%;
-}
 
-div#table table {
-    width: 100%;
-}
-
-thead.res_table th {
-    border-style: solid;
-    border-width: 2px;
-    border-color: rgb(0, 0, 0);
-}
-
-tbody.res_table td {
-    border-style: solid;
-    border-width: 1px;
-    border-color: rgb(0, 0, 0);
-    height: 40px;
-}
-
-td.res_table_ip {
-    width: 350px;
-    text-align: center;
-    font-family: monospace;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-td.res_table_mount {
-    width: 250px;
-}
-
-td.res_table_agent {
-    font-size: 10px;
-}
-
-td.res_table_startstop {
-    width: 180px;
-    text-align: center;
-    font-family: monospace;
-    font-size: 14px;
-}
-
-td.res_table_duration {
-    width: 100px;
-    text-align: center;
-    font-family: monospace;
-    font-size: 14px;
-}
-
-span.small_agent {
-    font-size: 9px;
+    });
 }

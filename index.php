@@ -28,15 +28,6 @@
  */
 
 ?>
-<?php
-
-$page_path = "";
-$cwd = getcwd();
-$site_root = substr(getcwd(), 0, strlen($cwd) - strlen($page_path));
-
-require_once($site_root . "/includes/head.php");
-
-?>
 <html>
 
     <head>
@@ -52,6 +43,7 @@ require_once($site_root . "/includes/head.php");
         <script type="text/javascript" src="js/clock.js"></script>
         <script type="text/javascript" src="js/form.php"></script>
         <script type="text/javascript" src="js/footer.js"></script>
+        <script type="text/javascript" src="js/dns.js"></script>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.3/jquery-ui.min.css" />
         <link rel="stylesheet" type="text/css" href="css/jquery-ui-timepicker.css" />
         <link rel="stylesheet" type="text/css" href="css/page.css" />

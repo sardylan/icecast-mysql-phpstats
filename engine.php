@@ -103,7 +103,8 @@ if($action == "mountpoints") {
 }
 
 if($action == "table") {
-    $ret = "";
+    header("Content-type: text/html");
+    header("Cache-Control: no-cache, must-revalidate");
 
     $sql_condition_time = "WHERE tta.stop > FROM_UNIXTIME({$engine_start}) AND tta.start < FROM_UNIXTIME({$engine_stop}) AND tta.duration > 30";
     $sql_blacklist = "AND tta.ip NOT IN (SELECT ip FROM ipblacklist)";
@@ -113,7 +114,7 @@ if($action == "table") {
 
     $sql_query = "SELECT tta.ip AS ip, tta.agent AS agent, ttb.mount AS mount, tta.start AS start, tta.stop AS stop, tta.duration AS duration FROM stats tta, mountpoints ttb {$sql_condition_time} {$sql_blacklist} AND tta.mount = ttb.id {$sql_order} {$sql_limit}";
 
-    error_log($sql_query);
+//     error_log($sql_query);
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
@@ -121,8 +122,10 @@ if($action == "table") {
                 $user_agent = cleanUserAgent($sql_data["agent"]);
                 $user_agent_parsed = parseUserAgent($user_agent);
 
+                $ret = "";
+
                 $ret .= "<tr>";
-                $ret .= "<td class=\"res_table_ip\"><a href=\"http://www.geoiptool.com/?IP={$sql_data["ip"]}\">{$sql_data["ip"]}</a></td>";
+                $ret .= "<td class=\"res_table_ip\"><a href=\"http://www.geoiptool.com/?IP={$sql_data["ip"]}\">{$sql_data["ip"]}</a><br /><span class=\"small_agent\"></span></td>";
                 $ret .= "<td class=\"res_table_mount\">{$sql_data["mount"]}</td>";
 
 //                 if($user_agent_parsed == $user_agent)
@@ -135,12 +138,10 @@ if($action == "table") {
                 $ret .= "<td class=\"res_table_startstop\">{$sql_data["start"]}<br />{$sql_data["stop"]}</td>";
                 $ret .= "<td class=\"res_table_duration\">" . date("H:i:s", $sql_data["duration"] - 3600) . "</td>";
                 $ret .= "</tr>";
+
+                echo $ret;
+                flush();
             }
-
-    header("Content-type: text/html");
-    header("Cache-Control: no-cache, must-revalidate");
-
-    echo $ret;
 }
 
 ?>
