@@ -40,6 +40,7 @@ $sql_limit = "LIMIT 0, 30";
 // action=text&start=" + $("#search_start").val() + "&stop=" + $("#search_stop").val() + "&mountpoints=" + $("#mounts_select").val().join(),
 
 $action = my_get("action");
+$mountpoints = my_get("mountpoints");
 
 $engine_start = strtotime(my_get("start") . ":00");
 $engine_stop = strtotime(my_get("stop") . ":59");
@@ -55,9 +56,10 @@ if($action == "text") {
     $ret["aveonlinetime"] = "";
 
     $sql_condition_time = "WHERE stop > FROM_UNIXTIME({$engine_start}) AND start < FROM_UNIXTIME({$engine_stop}) AND duration > 30";
+    $sql_condition_mountpoints = "AND mount in ({$mountpoints})";
     $sql_blacklist = "AND ip NOT IN (SELECT ip FROM ipblacklist)";
 
-    $sql_query = "SELECT COUNT(id) AS listeners, MAX(duration) AS maxonlinetime, MIN(duration) AS minonlinetime FROM stats {$sql_condition_time} {$sql_blacklist} ORDER BY duration DESC {$sql_limit}";
+    $sql_query = "SELECT COUNT(id) AS listeners, MAX(duration) AS maxonlinetime, MIN(duration) AS minonlinetime FROM stats {$sql_condition_time} {$sql_blacklist} {$sql_condition_mountpoints} ORDER BY duration DESC {$sql_limit}";
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
@@ -67,7 +69,7 @@ if($action == "text") {
                 $ret["minonlinetime"] = date("H:i:s", (int) ($sql_data["minonlinetime"]) - 3600);
             }
 
-    $sql_query = "SELECT COUNT(id) AS listeners, SUM(duration) AS sum FROM stats {$sql_condition_time} {$sql_blacklist}";
+    $sql_query = "SELECT COUNT(id) AS listeners, SUM(duration) AS sum FROM stats {$sql_condition_time} {$sql_blacklist} {$sql_condition_mountpoints}";
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
@@ -84,10 +86,11 @@ if($action == "mountpoints") {
     $ret = "";
 
     $sql_condition_time = "WHERE tta.stop > FROM_UNIXTIME({$engine_start}) AND tta.start < FROM_UNIXTIME({$engine_stop}) AND tta.duration > 30";
+    $sql_condition_mountpoints = "AND tta.mount in ({$mountpoints})";
     $sql_blacklist = "AND tta.ip NOT IN (SELECT ip FROM ipblacklist)";
     $sql_limit = "LIMIT 0, 30";
 
-    $sql_query = "SELECT COUNT(tta.id) AS listeners, ttb.mount AS mount FROM stats tta, mountpoints ttb {$sql_condition_time} {$sql_blacklist} AND tta.mount = ttb.id GROUP BY mount";
+    $sql_query = "SELECT COUNT(tta.id) AS listeners, ttb.mount AS mount FROM stats tta, mountpoints ttb {$sql_condition_time} {$sql_blacklist} {$sql_condition_mountpoints} AND tta.mount = ttb.id GROUP BY mount";
 
     error_log($sql_query);
 
@@ -107,12 +110,13 @@ if($action == "table") {
     header("Cache-Control: no-cache, must-revalidate");
 
     $sql_condition_time = "WHERE tta.stop > FROM_UNIXTIME({$engine_start}) AND tta.start < FROM_UNIXTIME({$engine_stop}) AND tta.duration > 30";
+    $sql_condition_mountpoints = "AND tta.mount in ({$mountpoints})";
     $sql_blacklist = "AND tta.ip NOT IN (SELECT ip FROM ipblacklist)";
     $sql_limit = "";
 
     $sql_order = "ORDER BY duration DESC";
 
-    $sql_query = "SELECT tta.ip AS ip, tta.agent AS agent, ttb.mount AS mount, tta.start AS start, tta.stop AS stop, tta.duration AS duration FROM stats tta, mountpoints ttb {$sql_condition_time} {$sql_blacklist} AND tta.mount = ttb.id {$sql_order} {$sql_limit}";
+    $sql_query = "SELECT tta.ip AS ip, tta.agent AS agent, ttb.mount AS mount, tta.start AS start, tta.stop AS stop, tta.duration AS duration FROM stats tta, mountpoints ttb {$sql_condition_time} {$sql_blacklist} {$sql_condition_mountpoints} AND tta.mount = ttb.id {$sql_order} {$sql_limit}";
 
 //     error_log($sql_query);
 
