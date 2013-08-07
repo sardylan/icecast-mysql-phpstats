@@ -90,7 +90,7 @@ function runsearch()
                 $.ajax({
                     type: "GET",
                     url: "engine.php",
-                    data: "action=table&start=" + $("#search_start").val() + "&stop=" + $("#search_stop").val() + "&mountpoints=" + $("#mounts_select").val().join(),
+                    data: "action=table&start=" + $("#search_start").val() + "&stop=" + $("#search_stop").val() + "&mountpoints=" + $("#mounts_select").val().join() + "&order=" + $("#table_order").val(),
                     success: function(response) {
                         $("#res_table").html(response);
                         setTimeout(obtainHostNames(), 1500);
@@ -262,5 +262,39 @@ $(document).ready(function() {
         $("#search_stop").datetimepicker("setDate", date_stop);
 
         runsearch();
+    });
+
+    function doSearch(order) {
+        $("input#table_order").val(order);
+
+        var date_start = $("#search_start").datetimepicker("getDate");
+        var date_stop = $("#search_stop").datetimepicker("getDate");
+
+        if(date_start < new Date(<?php echo mysql2jsDate($sql_data["start"]); ?>))
+            date_start = new Date(<?php echo mysql2jsDate($sql_data["start"]); ?>);
+
+        if(date_stop > new Date(<?php echo mysql2jsDate($sql_data["stop"]); ?>))
+            date_stop = new Date(<?php echo mysql2jsDate($sql_data["stop"]); ?>);
+
+        $("#search_start").datetimepicker("setDate", date_start);
+        $("#search_stop").datetimepicker("setDate", date_stop);
+
+        runsearch();
+    }
+
+    $("th.res_table_ip").click(function() {
+        doSearch("ip");
+    });
+
+    $("th.res_table_mount").click(function() {
+        doSearch("mount");
+    });
+
+    $("th.res_table_startstop").click(function() {
+        doSearch("start");
+    });
+
+    $("th.res_table_duration").click(function() {
+        doSearch("duration");
     });
 });

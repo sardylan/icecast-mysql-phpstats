@@ -61,6 +61,7 @@
             </div>
             <div class="spacer"></div>
             <form>
+                <input type="hidden" id="table_order" name="table_order" value="duration" />
                 <div id="querychooser">
                     <div id="chooser-mounts">
                         <select id="mounts_select" name="mounts_select" multiple="multiple" size="5">
@@ -87,18 +88,19 @@
             <div class="spacer"></div>
             <div id="content">
                 <div id="summary">
-                    <div id="summary-text"><p>Activites from <span id="res_start"></span> to <span id="res_stop"></span></p>
-                        <p>Total days: <span id="res_days"></span><br />
-                            Total listeners: <span id="res_listeners"></span><br />
-                            Max on-line time: <span id="res_maxonlinetime"></span><br />
-                            Min on-line time: <span id="res_minonlinetime"></span><br />
-                            Average on-line time: <span id="res_aveonlinetime"></span></p>
-                        <p>Mount point activity</p>
+                    <div id="summary-text"><p class="title">Activites from <span class="time_interval" id="res_start"></span> to <span class="time_interval" id="res_stop"></span></p>
+                        <p>Total days: <span id="res_days" class="res_info"></span><br />
+                            Total listeners: <span id="res_listeners" class="res_info"></span><br />
+                            Max on-line time: <span id="res_maxonlinetime" class="res_info"></span><br />
+                            Min on-line time: <span id="res_minonlinetime" class="res_info"></span><br />
+                            Average on-line time: <span id="res_aveonlinetime" class="res_info"></span></p>
+                        <p class="title">Mount point activity</p>
                         <ul id="resp_mountpoints_list"></ul></div>
                     <div id="summary-image"><img id="img_listeners" src="img/loading.png" alt="Listeners" title="Listeners" /></div>
                 </div>
                 <div class="spacer"></div>
                 <div id="table">
+                    <p class="title">Listeners activity</p>
                     <table>
                         <thead class="res_table">
                             <tr>

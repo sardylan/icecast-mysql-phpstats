@@ -41,6 +41,7 @@ $sql_limit = "LIMIT 0, 30";
 
 $action = my_get("action");
 $mountpoints = my_get("mountpoints");
+$order = my_get("order");
 
 $engine_start = strtotime(my_get("start") . ":00");
 $engine_stop = strtotime(my_get("stop") . ":59");
@@ -59,7 +60,7 @@ if($action == "text") {
     $sql_condition_mountpoints = "AND mount in ({$mountpoints})";
     $sql_blacklist = "AND ip NOT IN (SELECT ip FROM ipblacklist)";
 
-    $sql_query = "SELECT COUNT(id) AS listeners, MAX(duration) AS maxonlinetime, MIN(duration) AS minonlinetime FROM stats {$sql_condition_time} {$sql_blacklist} {$sql_condition_mountpoints} ORDER BY duration DESC {$sql_limit}";
+    $sql_query = "SELECT COUNT(id) AS listeners, MAX(duration) AS maxonlinetime, MIN(duration) AS minonlinetime FROM stats {$sql_condition_time} {$sql_blacklist} {$sql_condition_mountpoints}";
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
@@ -92,8 +93,6 @@ if($action == "mountpoints") {
 
     $sql_query = "SELECT COUNT(tta.id) AS listeners, ttb.mount AS mount FROM stats tta, mountpoints ttb {$sql_condition_time} {$sql_blacklist} {$sql_condition_mountpoints} AND tta.mount = ttb.id GROUP BY mount";
 
-    error_log($sql_query);
-
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)
             while($sql_data = $sql_result->fetch_array(MYSQLI_ASSOC))
@@ -114,11 +113,11 @@ if($action == "table") {
     $sql_blacklist = "AND tta.ip NOT IN (SELECT ip FROM ipblacklist)";
     $sql_limit = "";
 
-    $sql_order = "ORDER BY duration DESC";
+    $sql_order = "ORDER BY {$order} DESC";
 
     $sql_query = "SELECT tta.ip AS ip, tta.agent AS agent, ttb.mount AS mount, tta.start AS start, tta.stop AS stop, tta.duration AS duration FROM stats tta, mountpoints ttb {$sql_condition_time} {$sql_blacklist} {$sql_condition_mountpoints} AND tta.mount = ttb.id {$sql_order} {$sql_limit}";
 
-//     error_log($sql_query);
+    error_log($sql_query);
 
     if($sql_result = $sql_conn->query($sql_query))
         if($sql_result->num_rows > 0)

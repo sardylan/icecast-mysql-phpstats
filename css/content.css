@@ -55,6 +55,20 @@ div#table table {
     width: 100%;
 }
 
+p.title {
+    font-size: 24px;
+}
+
+span.time_interval {
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+span.res_info {
+    font-weight: bold;
+}
+
 thead.res_table th {
     border-style: solid;
     border-width: 2px;
