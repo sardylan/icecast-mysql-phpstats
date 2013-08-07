@@ -35,7 +35,7 @@ function updateHostnameSpan(text, obj)
 function obtainHostNames() {
     $("#res_table .res_table_ip > a").each(function(){
 
-        obj = $(this).parent().children("span");
+        obj = $(this).parent().children("span.small_agent");
         ip = this.innerText;
 
         $.ajax({
